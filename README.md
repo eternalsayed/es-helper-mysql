@@ -1,2 +1,3 @@
-# es-helper-db
-DB Helper for NodeJS projects
+# db-helper
+
+DB helper for NodeJS projects.
