@@ -12,9 +12,9 @@ Using `npm`, run below command:
 ```javascript
 const esMysql = require('es-helper-mysql');
 const dbo = esMysql.getDbHandle();
-const db = dbo.getInstance();
-db.query('SELECT * FROM users', (err, res) => {
-  db.end();
+const instance = dbo.getInstance();
+instance.query('SELECT * FROM users', (err, res) => {
+  instance.end();//don't keep the resources occupied!
   callback(err, res);
 });
 ```
