@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/eternalsayed/es-helper-mysql/issues"
   },
-  "homepage": "https://github.com/eternalsayed/es-helper-mysql#readme"
+  "homepage": "https://github.com/eternalsayed/es-helper-mysql#readme",
+  "dependencies": {
+    "mysql": "^2.17.1"
+  }
 }
