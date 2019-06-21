@@ -1,6 +1,6 @@
 {
   "name": "es-helper-mysql",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "DB helper for ES projects of NodeJS",
   "main": "index.js",
   "scripts": {
