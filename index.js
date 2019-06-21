@@ -1,8 +1,17 @@
 //Note: Original DB.JS renamed to MySQL.js. THIS FILE IS THE ONE BEING USED
 let handle = null;
 const mysql = require('mysql');
-let dbServers = require(__config + '/db/db.env');
-const debug = require('debug')(process.env.DEBUG);
+const debug = require('debug')(process.env.DEBUG || 'DB');
+
+let configPath = __config;
+configPath = configPath.replace(/\/+$/, '/');
+let dbServers = {}, dbEnvFile = __config + 'db/db.env';
+
+try {
+    dbServers = require(dbEnvFile);
+}catch(e) {
+    debug('ENV files missing for DB config at %s', dbEnvFile)    
+}
 let dbConfig;
 module.exports = {
     selectConfig: function(name) {
