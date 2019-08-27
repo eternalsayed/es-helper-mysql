@@ -23,7 +23,6 @@ module.exports = {
         if (!handle) {
             const mode = __isLocal ? 'local' : __mode;
             dbConfig = dbConfig || dbServers[mode];
-console.log(dbConfig);
             debug('Loaded db config for "%s" mode', mode, dbConfig.database);
 
             handle = mysql.createConnection(dbConfig);
