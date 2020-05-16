@@ -14,16 +14,20 @@ try {
 }
 let dbConfig;
 module.exports = {
-    selectConfig: function(name) {
+    selectConfig: function(name, skip) {
+        dbConfig = dbServers;
         this.selectedConfig = name.toLowerCase();
-        dbConfig = dbServers[this.selectedConfig];
-        this.reconnect();
+        let pickedConfig = dbServers[this.selectedConfig];
+        if(pickedDb && pickedConfig.host && pickedConfig.database) {
+            dbConfig = pickedConfig;
+        }
+        debug('Loaded db config for "%s" mode', mode, dbConfig.database);
+        !skip && this.reconnect();
     },
     connect: function () {
         if (!handle) {
             const mode = __isLocal ? 'local' : __mode;
-            dbConfig = dbConfig || dbServers[mode];
-            debug('Loaded db config for "%s" mode', mode, dbConfig.database);
+            dbConfig = dbConfig || this.selectConfig(mode, true);
 
             handle = mysql.createConnection(dbConfig);
             handle.connect(function (err) {
