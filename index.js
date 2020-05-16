@@ -10,7 +10,8 @@ let dbServers = {}, dbEnvFile = __config + 'db/db.env';
 try {
     dbServers = require(dbEnvFile);
 }catch(e) {
-    debug('ENV files missing for DB config at %s', dbEnvFile)    
+    debug('ENV files error %s', dbEnvFile);
+    debug('Error: ', e);
 }
 let dbConfig;
 module.exports = {
