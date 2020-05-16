@@ -19,7 +19,7 @@ module.exports = {
         dbConfig = dbServers;
         this.selectedConfig = name.toLowerCase();
         let pickedConfig = dbServers[this.selectedConfig];
-        if(pickedDb && pickedConfig.host && pickedConfig.database) {
+        if(pickedConfig && pickedConfig.host && pickedConfig.database) {
             dbConfig = pickedConfig;
         }
         debug('Loaded db config for "%s" mode', mode, dbConfig.database);
