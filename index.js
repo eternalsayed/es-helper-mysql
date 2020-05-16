@@ -22,7 +22,7 @@ module.exports = {
         if(pickedConfig && pickedConfig.host && pickedConfig.database) {
             dbConfig = pickedConfig;
         }
-        debug('Loaded db config for "%s" mode', mode, dbConfig.database);
+        debug('Loaded db config for "%s" mode', name, dbConfig.database);
         !skip && this.reconnect();
     },
     connect: function () {
