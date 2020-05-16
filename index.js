@@ -28,7 +28,7 @@ module.exports = {
     connect: function () {
         if (!handle) {
             const mode = __isLocal ? 'local' : __mode;
-            dbConfig = dbConfig || this.selectConfig(mode, true);
+            !dbConfig && this.selectConfig(mode, true);
 
             handle = mysql.createConnection(dbConfig);
             handle.connect(function (err) {
