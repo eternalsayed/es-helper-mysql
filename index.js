@@ -116,6 +116,9 @@ module.exports = {
         var query = "INSERT INTO " + table + " (" + keys.join(', ') + ") VALUES ?";
         return this.query(query, [values], callback);
     },
+    escape: str => {
+        return mysql.escape(str);
+    },
     getInstance: function () {
         return this;
     }
