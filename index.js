@@ -25,6 +25,7 @@ module.exports = {
         debug('Loaded db config for "%s" mode', name, dbConfig.database);
         !skip && this.reconnect();
     },
+    conn: handle,
     connect: function () {
         if (!handle) {
             const mode = __isLocal ? 'local' : __mode;
@@ -52,6 +53,21 @@ module.exports = {
     },
     getDbHandle: function () {
         return handle || this.connect();
+    },
+    selectDb: function(config, callback) {
+        let newConfig;
+        if(!config) {
+            return callback && callback("Required config missing");
+        }
+        if(typeof config==='string') {
+            newConfig = {database: config};
+        } else {
+            newConfig = {
+                ...config,
+                database: config.database || config.db || config.dbName
+            };
+        }
+        handle && handle.changeUser(newConfig, callback);
     },
     query: function (query, options, callback, failFlag) {
         var self = this;
