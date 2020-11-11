@@ -104,19 +104,16 @@ module.exports = {
                  return this.query(sql, data, callback);*/
         return this.query(query, data, callback);
     },
-    update: function (table, values, condition, callback) {
-        var query = "UPDATE " + table + " SET ?";
-        var data = values;
-        if (condition && Object.keys(condition).length) {
-            query += " WHERE ";
-            data = [values];
-            for (var key in condition) {
-                query += key + " ?, ";
-                data.push(condition[key]);
-            }
-            query = query.replace(/, $/, '');
-        }
-        this.query(query, data, callback);
+    update: function (table, data, condition, callback) {
+        const keys = Object.keys(data).map(i => i +'=?').join(',');
+        let values = Object.values(data);
+
+        const conditions = Object.keys(condition).map(i => i+'=?').join(' AND ');
+        values = values.concat(Object.values(condition));
+
+        const query = `UPDATE ${table} SET ${keys} WHERE ${conditions}`;
+
+        this.query(query, values, callback);
     },
     insertBatch: function (rows, table, callback) {
         var keys = [];
