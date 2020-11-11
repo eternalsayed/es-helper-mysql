@@ -116,7 +116,7 @@ module.exports = {
             }
             query = query.replace(/, $/, '');
         }
-        db.query(query, data, callback);
+        this.query(query, data, callback);
     },
     insertBatch: function (rows, table, callback) {
         var keys = [];
