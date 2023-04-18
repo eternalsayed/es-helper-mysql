@@ -67,8 +67,8 @@ module.exports = {
     handle && handle.changeUser(newConfig, callback);
   },
   query: function (query, options, callback, failFlag) {
-    var self = this;
-    var params = typeof options == "function" ? null : options;
+    const self = this;
+    const params = typeof options == "function" ? null : options;
     callback =
       callback === undefined
         ? typeof options == "function"
@@ -76,34 +76,34 @@ module.exports = {
           : null
         : callback;
     callback =
-      callback ||
-      function (err, res) {
-        console.warn("db.query defCallback::result: ", err, res);
-      };
-    var handle = self.getDbHandle();
-    var q = handle.query(query, params, callback).on("error", function (err) {
-      err && console.log("%s\nQuery failed with error:", q.sql, err);
-      if (err && !failFlag) {
-        var msg = err.message.split(":");
-        var error = {
-          code: msg[0],
-          message: msg[1] ? msg[1] : msg[0],
-          error: err,
-        };
-        self.query(
-          "INSERT INTO failed_query_log SET ?",
-          {
-            query: q.sql,
-            code: error.code,
-            message: error.message,
-          },
-          null,
-          true
-        );
-      }
-      return callback(err);
-    });
-    return q;
+      callback || ((err, res) => console.warn("db.query defCallback::result: ", err, res))
+    const handle = self.getDbHandle();
+    try {
+      const q = handle.query(query, params, callback).on("error", function (err) {
+        err && console.log("%s\nQuery failed with error:", q.sql, err);
+        if (err && !failFlag) {
+          const msg = err.message.split(":");
+          const error = {
+            code: msg[0],
+            message: msg[1] ? msg[1] : msg[0],
+            error: err,
+          };
+          self.query("INSERT INTO failed_query_log SET ?", {
+              query: q.sql,
+              code: error.code,
+              message: error.message,
+            },
+            null,
+            true
+          );
+        }
+        return callback(err);
+      });
+      return q; 
+    } catch(e) {
+      console.log('Error in performing query:\n', e);
+      callback(e);
+    }
   },
   insert: function (data, table, callback) {
     var query = "INSERT INTO " + table + " SET ?";
