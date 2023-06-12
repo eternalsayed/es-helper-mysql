@@ -1,6 +1,6 @@
 {
   "name": "es-helper-mysql",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "DB helper for ES projects of NodeJS",
   "main": "index.js",
   "scripts": {
@@ -18,6 +18,6 @@
   },
   "homepage": "https://github.com/eternalsayed/es-helper-mysql#readme",
   "dependencies": {
-    "mysql": "^2.17.1"
+    "mysql2": "^3.3.4"
   }
 }

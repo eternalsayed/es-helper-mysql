@@ -1,4 +1,4 @@
-const mysql = require("mysql");
+const mysql2 = require("mysql2");
 const debug = require("debug")(process.env.DEBUG || "DB");
 
 let dbServers = {},
@@ -12,7 +12,7 @@ try {
 }
 let dbConfig;
 module.exports = {
-  selectConfig: function (name, skip) {
+  selectConfig(name, skip) {
     dbConfig = dbServers;
     this.selectedConfig = name.toLowerCase();
     let pickedConfig = dbServers[this.selectedConfig];
@@ -23,12 +23,12 @@ module.exports = {
     !skip && this.reconnect();
   },
   conn: handle,
-  connect: function () {
+  connect() {
     if (!handle) {
       const mode = __isLocal ? "local" : __mode;
       !dbConfig && this.selectConfig(mode, true);
 
-      handle = mysql.createConnection(dbConfig);
+      handle = mysql2.createConnection(dbConfig);
       handle.connect(function (err) {
         if (err) {
           console.log("Error connecting to Db:", err);
@@ -40,18 +40,18 @@ module.exports = {
     }
     return handle;
   },
-  reconnect: function () {
+  reconnect() {
     this.end();
     this.connect();
   },
-  end: function () {
+  end() {
     handle && handle.end && handle.end();
     handle = null;
   },
-  getDbHandle: function () {
+  getDbHandle() {
     return handle || this.connect();
   },
-  selectDb: function (config, callback) {
+  selectDb(config, callback) {
     let newConfig;
     if (!config) {
       return callback && callback("Required config missing");
@@ -66,7 +66,7 @@ module.exports = {
     }
     handle && handle.changeUser(newConfig, callback);
   },
-  query: function (query, options, callback, failFlag) {
+  query(query, options, callback, failFlag) {
     const self = this;
     const params = typeof options == "function" ? null : options;
     callback =
@@ -76,44 +76,49 @@ module.exports = {
           : null
         : callback;
     callback =
-      callback || ((err, res) => console.warn("db.query defCallback::result: ", err, res))
+      callback ||
+      ((err, res) => console.warn("db.query defCallback::result: ", err, res));
     const handle = self.getDbHandle();
     try {
-      const q = handle.query(query, params, callback).on("error", function (err) {
-        err && console.log("%s\nQuery failed with error:", q.sql, err);
-        if (err && !failFlag) {
-          const msg = err.message.split(":");
-          const error = {
-            code: msg[0],
-            message: msg[1] ? msg[1] : msg[0],
-            error: err,
-          };
-          self.query("INSERT INTO failed_query_log SET ?", {
-              query: q.sql,
-              code: error.code,
-              message: error.message,
-            },
-            null,
-            true
-          );
-        }
-        return callback(err);
-      });
-      return q; 
-    } catch(e) {
-      console.log('Error in performing query:\n', e);
+      const q = handle
+        .query(query, params, callback)
+        .on("error", function (err) {
+          err && console.log("%s\nQuery failed with error:", q.sql, err);
+          if (err && !failFlag) {
+            const msg = err.message.split(":");
+            const error = {
+              code: msg[0],
+              message: msg[1] ? msg[1] : msg[0],
+              error: err,
+            };
+            self.query(
+              "INSERT INTO failed_query_log SET ?",
+              {
+                query: q.sql,
+                code: error.code,
+                message: error.message,
+              },
+              null,
+              true
+            );
+          }
+          return callback(err);
+        });
+      return q;
+    } catch (e) {
+      console.log("Error in performing query:\n", e);
       callback(e);
     }
   },
-  insert: function (data, table, callback) {
+  insert(data, table, callback) {
     var query = "INSERT INTO " + table + " SET ?";
     /*
                  var inserts = [data];
-                 var sql = mysql.format(query, inserts);
+                 var sql = mysql2.format(query, inserts);
                  return this.query(sql, data, callback);*/
     return this.query(query, data, callback);
   },
-  update: function (table, data, condition, callback) {
+  update(table, data, condition, callback) {
     const keys = Object.keys(data)
       .map((i) => i + "=?")
       .join(",");
@@ -128,7 +133,7 @@ module.exports = {
 
     this.query(query, values, callback);
   },
-  insertBatch: function (rows, table, callback) {
+  insertBatch(rows, table, callback) {
     var keys = [];
     var values = [];
     rows.forEach(function (row, index) {
@@ -143,9 +148,9 @@ module.exports = {
     return this.query(query, [values], callback);
   },
   escape: (str) => {
-    return mysql.escape(str);
+    return mysql2.escape(str);
   },
-  getInstance: function () {
+  getInstance() {
     return this;
   },
 };
