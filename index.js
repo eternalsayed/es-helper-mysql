@@ -80,31 +80,7 @@ module.exports = {
       ((err, res) => console.warn("db.query defCallback::result: ", err, res));
     const handle = self.getDbHandle();
     try {
-      const q = handle
-        .query(query, params, callback)
-        .on("error", function (err) {
-          err && console.log("%s\nQuery failed with error:", q.sql, err);
-          if (err && !failFlag) {
-            const msg = err.message.split(":");
-            const error = {
-              code: msg[0],
-              message: msg[1] ? msg[1] : msg[0],
-              error: err,
-            };
-            self.query(
-              "INSERT INTO failed_query_log SET ?",
-              {
-                query: q.sql,
-                code: error.code,
-                message: error.message,
-              },
-              null,
-              true
-            );
-          }
-          return callback(err);
-        });
-      return q;
+      return handle.query(query, params, callback);
     } catch (e) {
       console.log("Error in performing query:\n", e);
       callback(e);
