@@ -20,13 +20,13 @@ module.exports = {
       dbConfig = pickedConfig;
     }
     debug('Loaded db config for "%s" mode', name, dbConfig.database);
-    !skip && this.reconnect();
+    !skip && this.reconnect(); // not sure if this line should be here (could cause infinite recursion)
   },
   conn: handle,
-  connect() {
-    if (!handle) {
-      const mode = __isLocal ? "local" : __mode;
-      !dbConfig && this.selectConfig(mode, true);
+  connect(withMode) {
+    if (!handle || withMode) {
+      const mode = withMode || (__isLocal ? "local" : __mode);
+      this.selectConfig(mode, true);
 
       handle = mysql2.createConnection(dbConfig);
       handle.connect(function (err) {
@@ -126,7 +126,15 @@ module.exports = {
   escape: (str) => {
     return mysql2.escape(str);
   },
-  getInstance() {
+  getInstance(forDB) {
+    if (forDB) {
+      this.tempDbChange = true;
+      this.connect(forDB);
+    } else if (this.tempDbChange) {
+      // go back to using previous db config before when config was changed
+      this.tempDbChange = false;
+      this.reconnect();
+    }
     return this;
   },
 };
